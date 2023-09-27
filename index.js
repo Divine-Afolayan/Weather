@@ -12,17 +12,22 @@ async function checkWeather(cityName) {
     if (response.status === 404) {
         document.querySelector('.error').style.display = 'block';
         document.querySelector('.weather').style.display = 'none';
+        return;
     }
 
     if (response.status === 200) {
         document.querySelector('.error').style.display = 'none';
         document.querySelector('.weather').style.display = 'block';
+
+        const data = await response.json();
+        console.log(data);
+        displayWeather(data);
     }
 
-    let data = await response.json();
+    console.error("Unable to fetch weather data.");
+}
 
-    console.log(data);
-
+function displayWeather(data) {
     const city = document.querySelector('.city');
     city.innerHTML = data.name;
     const temp = document.querySelector('.temp');
@@ -35,75 +40,27 @@ async function checkWeather(cityName) {
     let atmosphereData = data.weather[0].description
     atmosphere.innerHTML = atmosphereData.charAt(0).toUpperCase() + atmosphereData.slice(1);
 
-    switch (data.weather[0].main) {
-        case 'Clear':
-            weatherIcon.src = 'images/clear.png'
-            card.style.backgroundImage = "url(images/card-clear.jpg)"
-            break;
-        case 'Clouds':
-            weatherIcon.src = 'images/clouds.png'
-            card.style.backgroundImage = "url(images/card-clouds.jpg)"
-            break;
-        case 'Drizzle':
-            weatherIcon.src = 'images/drizzle.png'
-            card.style.backgroundImage = "url(images/card-drizzle.jpg)"
-            break;
-        case 'Mist':
-            weatherIcon.src = 'images/mist.png'
-            card.style.backgroundImage = "url(images/card-mist.jpg)"
-            break;
-        case 'Rain':
-            weatherIcon.src = 'images/rain.png'
-            card.style.backgroundImage = "url(images/card-rain.jpg)"
-            break;
-        case 'Snow':
-            weatherIcon.src = 'images/snow.png'
-            card.style.backgroundImage = "url(images/card-snow.jpg)"
-            break;
-        case 'Smoke':
-            weatherIcon.src = 'images/smoke.png'
-            card.style.backgroundImage = "url(images/card-smoke.jpg)"
-            break;
-        case 'Thunderstorm':
-            weatherIcon.src = 'images/thunder.png'
-            card.style.backgroundImage = "url(images/card-thunder.jpg)"
-            break;
-        case 'Squall':
-            weatherIcon.src = 'images/squall.png'
-            card.style.backgroundImage = "url(images/card-squall.jpg)"
-            break;
-        case 'Sand':
-            weatherIcon.src = 'images/sand.png'
-            card.style.backgroundImage = "url(images/card-sand.jpg)"
-            break;
-        case 'Ash':
-            weatherIcon.src = 'images/ash.png'
-            card.style.backgroundImage = "url(images/card-ash.jpg)"
-            break;
-        case 'Haze':
-            weatherIcon.src = 'images/haze.png'
-            card.style.backgroundImage = "url(images/card-haze.jpg)"
-            break;
-        case 'Dust':
-            weatherIcon.src = 'images/dust.png'
-            card.style.backgroundImage = "url(images/card-dust.jpg)"
-            break;
-        case 'Tornado':
-            weatherIcon.src = 'images/tornado.png'
-            card.style.backgroundImage = "url(images/card-tornado.jpg)"
-            break;
-        default:
-            console.log("None match!!!")
-    }
+    const { icon, backgroundImage } = getWeatherImage(data.weather[0].main.toLowerCase());
+    // TODO: add fallback image source for weather values we don't support
+    weatherIcon.src = icon;
+    card.style.backgroundImage = backgroundImage;
 
+    
     document.querySelector('.weather').style.display = 'block';
     document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + input.value + "')"
 }
 
-function enterKeypress(event) {
-    if (input.value.length > 0 && event.keyCode === 13) {
+function getWeatherImage(weather) {
+    return {
+        icon: `images/${weather}.png`,
+        backgroundImage: `url(images/card-${weather}.jpg)`
+    };
+}
+
+function handleKeyPress(event) {
+    if (input.value.trim() !== "" && event.keyCode === 13) {
         checkWeather(input.value)
     }
 }
 
-input.addEventListener("keypress", enterKeypress)
+input.addEventListener("keypress", handleKeyPress)
