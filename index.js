@@ -40,7 +40,8 @@ function displayWeather(data) {
     let atmosphereData = data.weather[0].description
     atmosphere.innerHTML = atmosphereData.charAt(0).toUpperCase() + atmosphereData.slice(1);
 
-    const { icon, backgroundImage } = getWeatherImage(data.weather[0].main.toLowerCase());
+    const { backgroundImage } = getWeatherBackgroundImg(data.weather[0].main.toLowerCase());
+    const { icon } = getWeatherIcon(data.weather[0].icon)
     // TODO: add fallback image source for weather values we don't support
     weatherIcon.src = icon;
     card.style.backgroundImage = backgroundImage;
@@ -50,9 +51,14 @@ function displayWeather(data) {
     document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + input.value + "')"
 }
 
-function getWeatherImage(weather) {
+function getWeatherIcon(weather) {
     return {
-        icon: `images/${weather}.png`,
+        icon: `https://openweathermap.org/img/wn/${weather}@4x.png`
+    }
+}
+
+function getWeatherBackgroundImg(weather) {
+    return {
         backgroundImage: `url(images/card-${weather}.jpg)`
     };
 }
